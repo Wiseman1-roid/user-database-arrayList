@@ -5,7 +5,6 @@ public class Prompter{
 
 		Scanner input = new Scanner(System.in);
 		System.out.println(getInput);
-
 		return input.nextLine();
 	}
 }

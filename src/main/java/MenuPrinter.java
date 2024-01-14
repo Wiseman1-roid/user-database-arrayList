@@ -4,15 +4,15 @@ import java.util.*;
 
 public class MenuPrinter {
 
-    private static int maxAttempts = 3;
+    private static final int maxAttempts = 3;
     private static int attempts = 0;
-    private static int lastAttempts = 3;
     private static int initialAttempt = 0;
-    private static String filePath = "fhulu.txt";
     private static int count;
+    UserDAO daoCall = new UserDAO();
     static int userID() {
         try {
             count++;
+            String filePath = "fhulu.txt";
             SerializationHelper.serialiseToFile(count, filePath);
         } catch (IOException e) {
             e.printStackTrace();
@@ -20,7 +20,7 @@ public class MenuPrinter {
         return count;
     }
 
-    public static void print() {
+    public void print() {
 
         while (true) {
             String test = Prompter.prompt(
@@ -59,20 +59,18 @@ public class MenuPrinter {
         }
     }
 
-    static void createUser() {
+    void createUser() {
 
         String name = Prompter.prompt("Enter name:");
         String surname = Prompter.prompt("Enter surname:");
         String email = Prompter.prompt("Enter email:");
-
         String toInt = String.valueOf(userID());
 
         if (EmailValidator.validateEmail(email)) {
-
             String dateOfBirth = Prompter.prompt("Enter your date of birth:");
             if (DateValidator.isValid(dateOfBirth)) {
-                UserDAO.create(name, surname, email, dateOfBirth, dateOfBirth, toInt);
-                MenuPrinter.print();
+                daoCall.create(name, surname, email, dateOfBirth, dateOfBirth, toInt);
+                print();
             } else {
                 int maxAttempts = 3;
                 int attempts = 0;
@@ -80,13 +78,13 @@ public class MenuPrinter {
                     System.out.println("Invalid Date of Birth,");
                     dateOfBirth = Prompter.prompt("please input the correct Date of Birth:");
                     if (DateValidator.isValid(dateOfBirth)) {
-                        UserDAO.create(name, surname, email, dateOfBirth, dateOfBirth, toInt);
-                        MenuPrinter.print();
+                        daoCall.create(name, surname, email, dateOfBirth, dateOfBirth, toInt);
+                        print();
                     } else {
                         attempts++;
                         if (attempts >= maxAttempts) {
                             System.out.println("Maximum number of attempts reached.");
-                            MenuPrinter.print();
+                            print();
                         }
                     }
                 }
@@ -103,8 +101,9 @@ public class MenuPrinter {
                         System.out.println("Invalid Date of Birth,");
                         dateOfBirth = Prompter.prompt("please input the correct Date of Birth.");
                         initialAttempt++;
+                        int lastAttempts = 3;
                         if (DateValidator.isValid(dateOfBirth)) {
-                            UserDAO.create(name, surname, email, dateOfBirth, dateOfBirth, toInt);
+                            daoCall.create(name, surname, email, dateOfBirth, dateOfBirth, toInt);
                             print();
                         } else if (initialAttempt == lastAttempts) {
 
@@ -116,18 +115,18 @@ public class MenuPrinter {
                     attempts++;
                     if (attempts >= maxAttempts) {
                         System.out.println("Maximum number of attempts reached.");
-                        MenuPrinter.print();
+                        print();
                     }
                 }
             }
         }
     }
 
-    static void updateUser() {
+    void updateUser() {
         int maxAttempts = 3;
         int attempts = 0;
         String emailToUpdate = Prompter.prompt("Enter email to update user.");
-        ArrayList<String> userEmail = UserDAO.getUserByEmail(emailToUpdate);
+        ArrayList<String> userEmail = daoCall.getUserByEmail(emailToUpdate);
 
         if (userEmail != null) {
             String newName = Prompter.prompt("Enter new name:");
@@ -135,19 +134,19 @@ public class MenuPrinter {
             String newDob = Prompter.prompt("Enter new date of birth:");
 
             if (DateValidator.isValid(newDob)) {
-                UserDAO.update(emailToUpdate, newName, newSurname, newDob);
-                MenuPrinter.print();
+                daoCall.update(emailToUpdate, newName, newSurname, newDob);
+                print();
             } else {
-                attempts++;
                 while (!DateValidator.isValid(newDob) && attempts < maxAttempts) {
+                    attempts++;
                     System.out.println("Invalid Date of Birth, please input the correct Date of Birth.");
                     newDob = Prompter.prompt("Enter your date of birth:");
                     if (DateValidator.isValid(newDob)) {
-                        UserDAO.update(emailToUpdate, newName, newSurname, newDob);
-                        MenuPrinter.print();
+                        daoCall.update(emailToUpdate, newName, newSurname, newDob);
+                        print();
                     } else if (attempts >= maxAttempts) {
                         System.out.println("Maximum number of attempts reached.");
-                        MenuPrinter.print();
+                        print();
                     }
                 }
             }
@@ -156,15 +155,15 @@ public class MenuPrinter {
         }
     }
 
-    static void deleteUser() {
+    void deleteUser() {
 
         String emailToDelete = Prompter.prompt("Enter email to delete user:");
-        UserDAO.delete(emailToDelete);
+        daoCall.delete(emailToDelete);
     }
 
-    static void listUsers() {
+    void listUsers() {
 
-        ArrayList<ArrayList<String>> allUsers = UserDAO.findAll();
+        ArrayList<ArrayList<String>> allUsers = daoCall.findAll();
         if (allUsers != null && allUsers.size() > 0) {
             System.out.println("User Data:");
 
@@ -179,10 +178,10 @@ public class MenuPrinter {
         }
     }
 
-    static void listUser() {
+    void listUser() {
 
         String emailToSearch = Prompter.prompt("Enter email to search for a user:");
-        ArrayList<String> user = UserDAO.getUserByEmail(emailToSearch);
+        ArrayList<String> user = daoCall.getUserByEmail(emailToSearch);
 
         if (user != null) {
             System.out.println("User found:");
