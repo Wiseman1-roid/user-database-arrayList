@@ -1,30 +1,27 @@
 import java.util.*;
-import java.io.IOException;
-import java.util.*;
 
 public class MenuPrinter {
 
     private static final int maxAttempts = 3;
-    private static int attempts = 0;
-    private static int initialAttempt = 0;
-    private static int count;
+    private static int attempts;
+    private static int initialAttempt;
     UserDAO daoCall = new UserDAO();
-    static int userID() {
-        try {
-            count++;
-            String filePath = "fhulu.txt";
-            SerializationHelper.serialiseToFile(count, filePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return count;
-    }
 
     public void print() {
 
         while (true) {
             String test = Prompter.prompt(
-                    "\nHello, welcome to the user database\nSelect an option:\n\n1. Add user\n2. Update user\n3. Delete user\n4. List users\n5. List user\n6. Exit");
+                    """
+
+                            Hello, welcome to the user database
+                            Select an option:
+
+                            1. Add user
+                            2. Update user
+                            3. Delete user
+                            4. List all users
+                            5. List user
+                            6. Exit""");
 
             if (MenuValidator.validate(test)) {
                 switch (test) {
@@ -53,7 +50,8 @@ public class MenuPrinter {
                         break;
                 }
             } else {
-                System.out.println("You have selected an invalid option.\nPlease select from the options below:");
+                System.out.println("You have selected an invalid option." +
+                        "\nPlease select from the options below:");
                 print();
             }
         }
@@ -64,7 +62,7 @@ public class MenuPrinter {
         String name = Prompter.prompt("Enter name:");
         String surname = Prompter.prompt("Enter surname:");
         String email = Prompter.prompt("Enter email:");
-        String toInt = String.valueOf(userID());
+        String toInt = String.valueOf(0);
 
         if (EmailValidator.validateEmail(email)) {
             String dateOfBirth = Prompter.prompt("Enter your date of birth:");
@@ -106,7 +104,6 @@ public class MenuPrinter {
                             daoCall.create(name, surname, email, dateOfBirth, dateOfBirth, toInt);
                             print();
                         } else if (initialAttempt == lastAttempts) {
-
                             System.out.println("Maximum number of attempts reached.");
                             print();
                         }
@@ -132,7 +129,6 @@ public class MenuPrinter {
             String newName = Prompter.prompt("Enter new name:");
             String newSurname = Prompter.prompt("Enter new surname:");
             String newDob = Prompter.prompt("Enter new date of birth:");
-
             if (DateValidator.isValid(newDob)) {
                 daoCall.update(emailToUpdate, newName, newSurname, newDob);
                 print();
@@ -164,9 +160,8 @@ public class MenuPrinter {
     void listUsers() {
 
         ArrayList<ArrayList<String>> allUsers = daoCall.findAll();
-        if (allUsers != null && allUsers.size() > 0) {
+        if (allUsers != null && !allUsers.isEmpty()) {
             System.out.println("User Data:");
-
             for (ArrayList<String> user : allUsers) {
                 for (String data : user) {
                     System.out.printf("%-20s", data);
@@ -190,7 +185,6 @@ public class MenuPrinter {
             System.out.println("Email: " + user.get(2));
             System.out.println("Date of Birth: " + user.get(3));
             System.out.println("ID: " + user.get(4));
-
         } else {
             System.out.println("User not found in the database.");
         }
